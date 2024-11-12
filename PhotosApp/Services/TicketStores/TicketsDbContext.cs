@@ -10,5 +10,7 @@ namespace PhotosApp.Services.TicketStores
         }
 
         public DbSet<TicketEntity> Tickets { get; set; }
+
+
     }
 }
