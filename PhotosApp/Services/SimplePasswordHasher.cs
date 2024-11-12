@@ -28,12 +28,19 @@ namespace PhotosApp.Services
         public PasswordVerificationResult VerifyHashedPassword(TUser user,
             string hashedPassword, string providedPassword)
         {
-            byte[] expectedHashBytes = Convert.FromBase64String(hashedPassword);
-            byte[] actualHashBytes = Convert.FromBase64String(HashPassword(user, providedPassword));
+            var hashedPasswordBytes = Convert.FromBase64String(hashedPassword);
 
-            // Если providedPassword корректен, то в результате хэширования его с той же самой солью,
-            // что и оригинальный пароль, должен получаться тот же самый хэш.
-            return AreByteArraysEqual(actualHashBytes, expectedHashBytes)
+            var saltBytes = new byte[SaltSizeInBits / 8];
+
+            Buffer.BlockCopy(
+                hashedPasswordBytes, 0,
+                saltBytes, 0,
+                saltBytes.Length);
+
+            var hashBytes = GetHashBytes(providedPassword, saltBytes);
+            var hashedProvidedPassword = ConcatenateBytes(saltBytes, hashBytes);
+
+            return AreByteArraysEqual(hashedPasswordBytes, hashedProvidedPassword)
                 ? PasswordVerificationResult.Success
                 : PasswordVerificationResult.Failed;
         }
