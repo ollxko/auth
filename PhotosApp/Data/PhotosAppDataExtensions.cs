@@ -27,13 +27,14 @@ namespace PhotosApp.Data
                         scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database.Migrate();
                         scope.ServiceProvider.GetRequiredService<TicketsDbContext>().Database.Migrate();
 
+                        var roleService = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                        roleService.SeedWithSampleRolesAsync().Wait();
+
                         var photosDbContext = scope.ServiceProvider.GetRequiredService<PhotosDbContext>();
                         photosDbContext.SeedWithSamplePhotosAsync().Wait();
+
                         var ticketsDbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
                         ticketsDbContext.SeedWithSampleTicketsAsync().Wait();
-
-                        
-
 
                         // Add test users
 
@@ -188,6 +189,7 @@ namespace PhotosApp.Data
                     Email = "dev@gmail.com"
                 };
                 await userManager.RegisterUserIfNotExists(user, "Pass!2");
+                await userManager.AddToRoleAsync(user, "Dev");
             }
         }
 
